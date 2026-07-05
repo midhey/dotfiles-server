@@ -1,0 +1,10 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "dotfiles-server",
+      "draft": false
+    }
+  }
+}
+

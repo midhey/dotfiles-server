@@ -101,6 +101,29 @@ dotfiles в `$HOME`.
 chsh -s "$(command -v zsh)"
 ```
 
+### Релизы
+
+Релизы управляются через Release Please и Conventional Commits.
+
+Примеры commit messages:
+
+```text
+feat: add docker helpers
+fix: keep zsh startup working without optional tools
+docs: update install guide
+ci: add release workflow
+```
+
+При push в `master` или `main` GitHub Actions запускает Release Please. Он
+создает или обновляет release PR с changelog и version manifest. После merge
+release PR workflow создает GitHub Release, tag и архив:
+
+```text
+dist/dotfiles-server-vX.Y.Z.tar.gz
+```
+
+Архив также загружается как workflow artifact.
+
 ---
 
 ## English
@@ -203,3 +226,26 @@ after checking the server policy:
 ```bash
 chsh -s "$(command -v zsh)"
 ```
+
+### Releases
+
+Releases are managed by Release Please and Conventional Commits.
+
+Example commit messages:
+
+```text
+feat: add docker helpers
+fix: keep zsh startup working without optional tools
+docs: update install guide
+ci: add release workflow
+```
+
+On pushes to `master` or `main`, GitHub Actions runs Release Please. It creates
+or updates a release PR with the changelog and version manifest. After the
+release PR is merged, the workflow creates a GitHub Release, tag, and archive:
+
+```text
+dist/dotfiles-server-vX.Y.Z.tar.gz
+```
+
+The archive is also uploaded as a workflow artifact.
