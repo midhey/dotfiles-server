@@ -124,6 +124,24 @@ dist/dotfiles-server-vX.Y.Z.tar.gz
 
 Архив также загружается как workflow artifact.
 
+Если workflow падает с ошибкой `GitHub Actions is not permitted to create or
+approve pull requests`, включи разрешение в настройках репозитория:
+
+```text
+Settings -> Actions -> General -> Workflow permissions
+```
+
+Нужно выбрать `Read and write permissions` и включить `Allow GitHub Actions to
+create and approve pull requests`.
+
+Если это запрещено на уровне организации, создай fine-grained PAT или GitHub App
+token с доступом к repository contents и pull requests, затем сохрани его в
+repository secret:
+
+```text
+RELEASE_PLEASE_TOKEN
+```
+
 ---
 
 ## English
@@ -249,3 +267,21 @@ dist/dotfiles-server-vX.Y.Z.tar.gz
 ```
 
 The archive is also uploaded as a workflow artifact.
+
+If the workflow fails with `GitHub Actions is not permitted to create or approve
+pull requests`, enable the repository setting:
+
+```text
+Settings -> Actions -> General -> Workflow permissions
+```
+
+Select `Read and write permissions` and enable `Allow GitHub Actions to create
+and approve pull requests`.
+
+If this is blocked by organization policy, create a fine-grained PAT or GitHub
+App token with access to repository contents and pull requests, then save it as
+this repository secret:
+
+```text
+RELEASE_PLEASE_TOKEN
+```
