@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+set -u
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$ROOT/lib/common.sh"
+
+FAILURES=0
+
+ok() {
+  printf 'OK: %s\n' "$*"
+}
+
+missing() {
+  printf 'MISSING: %s\n' "$*"
+}
+
+check_required_command() {
+  local cmd="$1"
+  if command_exists "$cmd"; then
+    ok "$cmd found at $(command -v "$cmd")"
+  else
+    missing "$cmd"
+    FAILURES=$((FAILURES + 1))
+  fi
+}
+
+check_optional_command() {
+  local cmd="$1"
+  if command_exists "$cmd"; then
+    ok "$cmd found at $(command -v "$cmd")"
+  else
+    warn "$cmd not found"
+  fi
+}
+
+check_link() {
+  local source="$1"
+  local target="$2"
+
+  if [[ -L "$target" && "$(readlink "$target")" == "$source" ]]; then
+    ok "$target -> $source"
+  else
+    missing "$target is not linked to $source"
+    FAILURES=$((FAILURES + 1))
+  fi
+}
+
+printf 'dotfiles root: %s\n\n' "$ROOT"
+
+check_required_command zsh
+check_required_command git
+check_optional_command docker
+check_optional_command eza
+check_optional_command bat
+check_optional_command batcat
+check_optional_command fzf
+check_optional_command zoxide
+check_optional_command rg
+check_optional_command fd
+check_optional_command fdfind
+
+printf '\n'
+
+if [[ "$(basename "${SHELL:-}")" == zsh ]]; then
+  ok "login shell is zsh"
+else
+  warn "login shell is ${SHELL:-unknown}, not zsh"
+fi
+
+check_link "$ROOT/dotfiles/zsh/.zshenv" "$HOME/.zshenv"
+check_link "$ROOT/dotfiles/zsh/.zprofile" "$HOME/.zprofile"
+check_link "$ROOT/dotfiles/zsh/.zshrc" "$HOME/.zshrc"
+check_link "$ROOT/dotfiles/zsh/.p10k.zsh" "$HOME/.p10k.zsh"
+check_link "$ROOT/dotfiles/zsh/conf.d" "$HOME/.config/zsh/conf.d"
+check_link "$ROOT/dotfiles/git/config" "$HOME/.config/git/config"
+check_link "$ROOT/dotfiles/git/ignore" "$HOME/.config/git/ignore"
+
+printf '\n'
+
+if [[ -r "$HOME/.powerlevel10k/powerlevel10k.zsh-theme" ]]; then
+  ok "Powerlevel10k installed"
+else
+  warn "Powerlevel10k not installed; fallback prompt will be used"
+fi
+
+if [[ -r "$HOME/.local/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+  ok "zsh-autosuggestions installed"
+else
+  warn "zsh-autosuggestions not installed"
+fi
+
+if [[ -r "$HOME/.local/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+  ok "zsh-syntax-highlighting installed"
+else
+  warn "zsh-syntax-highlighting not installed"
+fi
+
+exit "$FAILURES"
+

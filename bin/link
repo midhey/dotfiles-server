@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$ROOT/lib/common.sh"
+
+BACKUP_ROOT="${DOTFILES_BACKUP_ROOT:-$HOME/.dotfiles-backup/$(timestamp)}"
+
+log "Linking dotfiles from $ROOT"
+
+link_path "$ROOT/dotfiles/zsh/.zshenv" "$HOME/.zshenv" "$BACKUP_ROOT"
+link_path "$ROOT/dotfiles/zsh/.zprofile" "$HOME/.zprofile" "$BACKUP_ROOT"
+link_path "$ROOT/dotfiles/zsh/.zshrc" "$HOME/.zshrc" "$BACKUP_ROOT"
+link_path "$ROOT/dotfiles/zsh/.p10k.zsh" "$HOME/.p10k.zsh" "$BACKUP_ROOT"
+link_path "$ROOT/dotfiles/zsh/conf.d" "$HOME/.config/zsh/conf.d" "$BACKUP_ROOT"
+
+link_path "$ROOT/dotfiles/git/config" "$HOME/.config/git/config" "$BACKUP_ROOT"
+link_path "$ROOT/dotfiles/git/ignore" "$HOME/.config/git/ignore" "$BACKUP_ROOT"
+
+log "Done"
+

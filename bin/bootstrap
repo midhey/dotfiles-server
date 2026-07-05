@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=../lib/common.sh
+source "$ROOT/lib/common.sh"
+# shellcheck source=../lib/packages.sh
+source "$ROOT/lib/packages.sh"
+
+INSTALL_PACKAGES=1
+INSTALL_PLUGINS=1
+
+for arg in "$@"; do
+  case "$arg" in
+    --no-packages)
+      INSTALL_PACKAGES=0
+      ;;
+    --no-plugins)
+      INSTALL_PLUGINS=0
+      ;;
+    -h | --help)
+      cat <<'USAGE'
+Usage: bin/bootstrap [--no-packages] [--no-plugins]
+
+Installs packages best-effort, installs zsh plugins best-effort, and links
+dotfiles into the current HOME. Existing files are moved to ~/.dotfiles-backup.
+USAGE
+      exit 0
+      ;;
+    *)
+      die "Unknown argument: $arg"
+      ;;
+  esac
+done
+
+if [[ "$INSTALL_PACKAGES" -eq 1 ]]; then
+  install_packages_best_effort
+else
+  log "Skipping package installation"
+fi
+
+if [[ "$INSTALL_PLUGINS" -eq 1 ]]; then
+  "$ROOT/scripts/install-zsh-plugins" || warn "Plugin installation failed"
+else
+  log "Skipping zsh plugin installation"
+fi
+
+"$ROOT/bin/link"
+
+log "Bootstrap complete"
+if command_exists zsh && [[ "$(basename "${SHELL:-}")" != zsh ]]; then
+  warn "Current login shell is not zsh. Review 'chsh -s \"$(command -v zsh)\"' if appropriate."
+fi
+

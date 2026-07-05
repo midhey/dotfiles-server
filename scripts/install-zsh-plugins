@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -u
+
+plugin_clone_or_update() {
+  local repo="$1"
+  local target="$2"
+
+  if [[ -d "$target/.git" ]]; then
+    printf '==> Updating %s\n' "$target"
+    git -C "$target" pull --ff-only
+    return $?
+  fi
+
+  if [[ -e "$target" ]]; then
+    printf 'WARN: %s exists and is not a git checkout; skipping\n' "$target" >&2
+    return 0
+  fi
+
+  printf '==> Cloning %s to %s\n' "$repo" "$target"
+  git clone --depth=1 "$repo" "$target"
+}
+
+if ! command -v git >/dev/null 2>&1; then
+  printf 'WARN: git is not available; skipping zsh plugins\n' >&2
+  exit 0
+fi
+
+mkdir -p "$HOME/.local/share/zsh/plugins"
+
+plugin_clone_or_update \
+  https://github.com/romkatv/powerlevel10k.git \
+  "$HOME/.powerlevel10k"
+
+plugin_clone_or_update \
+  https://github.com/zsh-users/zsh-autosuggestions.git \
+  "$HOME/.local/share/zsh/plugins/zsh-autosuggestions"
+
+plugin_clone_or_update \
+  https://github.com/zsh-users/zsh-syntax-highlighting.git \
+  "$HOME/.local/share/zsh/plugins/zsh-syntax-highlighting"
+
